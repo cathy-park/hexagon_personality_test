@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 질문을 로드하는 함수
     function loadQuestions() {
-        fetch('/static/questions.json')
+        fetch('/data/questions.json')
             .then(response => response.json())
             .then(data => {
                 window.questions = data;
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const start = currentPage * questionsPerPage;
         const end = start + questionsPerPage;
-        const currentQuestions = questions.slice(start, end);
+        const currentQuestions = window.questions.slice(start, end);
 
         currentQuestions.forEach((question, index) => {
             const questionElement = document.createElement("div");
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const start = currentPage * questionsPerPage;
         const end = start + questionsPerPage;
 
-        if (end >= questions.length) {
+        if (end >= window.questions.length) {
             submitResponses();
         } else {
             currentPage++;
