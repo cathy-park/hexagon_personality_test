@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, jsonify
 import json
 import os
 
@@ -36,7 +36,11 @@ personality_types = {
 
 @app.route('/')
 def index():
-    return render_template('index.html', questions=questions)
+    return render_template('index.html')
+
+@app.route('/get_questions')
+def get_questions():
+    return jsonify(questions)
 
 @app.route('/submit', methods=['POST'])
 def submit():
