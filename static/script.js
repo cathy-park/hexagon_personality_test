@@ -1,107 +1,299 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const questionsPerPage = 5;
-    let currentPage = 0;
-    let responses = {};
-    let questions = {};
+const questions = [
+    // 디지털 리터러시 (10문항)
+    {
+        question: "새로운 기술 도구를 배우는 것에 대해 어떻게 생각하나요?",
+        choices: ["매우 즐겁다", "관심 있다", "필요하면 배운다", "부담스럽다"]
+    },
+    {
+        question: "온라인 보안에 대해 얼마나 신경 쓰나요?",
+        choices: ["항상 주의한다", "어느 정도 신경 쓴다", "가끔 생각한다", "거의 신경 쓰지 않는다"]
+    },
+    {
+        question: "디지털 기기 사용 시간을 어떻게 관리하나요?",
+        choices: ["철저히 관리한다", "어느 정도 관리한다", "때때로 신경 쓴다", "특별히 관리하지 않는다"]
+    },
+    {
+        question: "온라인 정보의 신뢰성을 어떻게 판단하나요?",
+        choices: ["항상 다각도로 확인한다", "대체로 확인한다", "가끔 확인한다", "거의 확인하지 않는다"]
+    },
+    {
+        question: "클라우드 서비스 활용도는 어느 정도인가요?",
+        choices: ["매우 적극적으로 활용한다", "자주 활용한다", "가끔 활용한다", "거의 사용하지 않는다"]
+    },
+    {
+        question: "프로그래밍에 대한 관심도는 어떠한가요?",
+        choices: ["매우 높다", "관심 있다", "약간 있다", "전혀 없다"]
+    },
+    {
+        question: "디지털 툴을 이용한 협업 경험이 있나요?",
+        choices: ["자주 한다", "종종 한다", "가끔 한다", "거의 없다"]
+    },
+    {
+        question: "AI에 대한 이해도는 어느 정도인가요?",
+        choices: ["매우 높다", "어느 정도 있다", "기본적인 수준이다", "거의 없다"]
+    },
+    {
+        question: "디지털 콘텐츠 제작 경험이 있나요?",
+        choices: ["자주 만든다", "종종 만든다", "가끔 만든다", "거의 없다"]
+    },
+    {
+        question: "새로운 앱이나 서비스를 얼마나 자주 사용해 보나요?",
+        choices: ["매우 자주", "종종", "가끔", "거의 없음"]
+    },
+    // 피지컬 웰니스 (10문항)
+    {
+        question: "규칙적인 운동을 얼마나 자주 하나요?",
+        choices: ["매일", "주 3-4회", "주 1-2회", "거의 하지 않음"]
+    },
+    {
+        question: "식단 관리에 얼마나 신경 쓰나요?",
+        choices: ["매우 철저히", "어느 정도", "가끔", "거의 신경 쓰지 않음"]
+    },
+    {
+        question: "수면 시간은 평균적으로 어떻게 되나요?",
+        choices: ["7-8시간", "6-7시간", "5-6시간", "5시간 미만"]
+    },
+    {
+        question: "스트레스 관리를 위해 특별히 하는 활동이 있나요?",
+        choices: ["정기적으로 한다", "종종 한다", "가끔 한다", "특별히 없다"]
+    },
+    {
+        question: "정기적인 건강 검진을 받나요?",
+        choices: ["매년 받는다", "1-2년에 한 번", "가끔 받는다", "거의 받지 않는다"]
+    },
+    {
+        question: "물을 하루에 얼마나 마시나요?",
+        choices: ["2리터 이상", "1.5-2리터", "1-1.5리터", "1리터 미만"]
+    },
+    {
+        question: "앉아있는 시간을 줄이기 위해 노력하나요?",
+        choices: ["매우 노력한다", "어느 정도 노력한다", "가끔 신경 쓴다", "특별히 신경 쓰지 않는다"]
+    },
+    {
+        question: "명상이나 요가를 얼마나 자주 하나요?",
+        choices: ["매일 한다", "주 몇 회", "가끔 한다", "전혀 하지 않는다"]
+    },
+    {
+        question: "자신의 체력 수준을 어떻게 평가하나요?",
+        choices: ["매우 좋음", "좋은 편", "보통", "개선 필요"]
+    },
+    {
+        question: "건강한 생활 습관의 중요성을 얼마나 인식하고 있나요?",
+        choices: ["매우 중요하게 생각한다", "중요하다고 생각한다", "어느 정도 중요하다", "크게 중요하지 않다"]
+    },
+    // 감성 지능 (10문항)
+    {
+        question: "타인의 감정을 얼마나 잘 인식하나요?",
+        choices: ["매우 잘 인식한다", "대체로 잘 인식한다", "어느 정도 인식한다", "잘 인식하지 못한다"]
+    },
+    {
+        question: "자신의 감정을 얼마나 잘 조절할 수 있나요?",
+        choices: ["매우 잘 조절한다", "대체로 잘 조절한다", "어느 정도 조절한다", "조절이 어렵다"]
+    },
+    {
+        question: "스트레스 상황에서 감정 관리를 어떻게 하나요?",
+        choices: ["매우 잘 관리한다", "대체로 잘 관리한다", "어느 정도 관리한다", "관리가 어렵다"]
+    },
+    {
+        question: "타인과의 갈등 상황을 얼마나 잘 해결하나요?",
+        choices: ["매우 잘 해결한다", "대체로 잘 해결한다", "어느 정도 해결한다", "해결이 어렵다"]
+    },
+    {
+        question: "자신의 감정을 표현하는 것에 얼마나 편안함을 느끼나요?",
+        choices: ["매우 편안하다", "대체로 편안하다", "어느 정도 편안하다", "불편하다"]
+    },
+    {
+        question: "타인의 관점을 이해하려고 얼마나 노력하나요?",
+        choices: ["항상 노력한다", "자주 노력한다", "가끔 노력한다", "거의 노력하지 않는다"]
+    },
+    {
+        question: "감정적 스트레스를 받을 때 회복하는 속도는 어떠한가요?",
+        choices: ["매우 빠르다", "빠른 편이다", "보통이다", "느린 편이다"]
+    },
+    {
+        question: "타인의 감정에 얼마나 공감하나요?",
+        choices: ["매우 잘 공감한다", "잘 공감하는 편이다", "어느 정도 공감한다", "공감이 어렵다"]
+    },
+    {
+        question: "자신의 감정이 행동에 미치는 영향을 얼마나 잘 인식하나요?",
+        choices: ["매우 잘 인식한다", "잘 인식하는 편이다", "어느 정도 인식한다", "잘 인식하지 못한다"]
+    },
+    {
+        question: "감정 지능 향상을 위해 특별히 노력하나요?",
+        choices: ["매우 노력한다", "노력하는 편이다", "가끔 노력한다", "특별히 노력하지 않는다"]
+    },
+    // 초연결 네트워킹 (10문항)
+    {
+        question: "새로운 사람들과 관계를 맺는 것을 즐기나요?",
+        choices: ["매우 즐긴다", "즐기는 편이다", "어느 정도 즐긴다", "부담스럽다"]
+    },
+    {
+        question: "온라인 네트워킹 플랫폼을 얼마나 활발히 사용하나요?",
+        choices: ["매우 활발히", "자주 사용한다", "가끔 사용한다", "거의 사용하지 않는다"]
+    },
+    {
+        question: "다양한 배경의 사람들과 소통하는 것에 얼마나 편안함을 느끼나요?",
+        choices: ["매우 편안하다", "편안한 편이다", "어느 정도 편안하다", "불편하다"]
+    },
+    {
+        question: "네트워크를 통해 얻은 정보나 기회를 얼마나 잘 활용하나요?",
+        choices: ["매우 잘 활용한다", "잘 활용하는 편이다", "어느 정도 활용한다", "잘 활용하지 못한다"]
+    },
+    {
+        question: "전문적인 네트워크를 확장하기 위해 얼마나 노력하나요?",
+        choices: ["매우 노력한다", "노력하는 편이다", "가끔 노력한다", "특별히 노력하지 않는다"]
+    },
+    {
+        question: "온/오프라인 네트워킹 이벤트에 얼마나 자주 참여하나요?",
+        choices: ["매우 자주", "자주 참여한다", "가끔 참여한다", "거의 참여하지 않는다"]
+    },
+    {
+        question: "다른 사람들과 협업하는 것을 얼마나 즐기나요?",
+        choices: ["매우 즐긴다", "즐기는 편이다", "어느 정도 즐긴다", "선호하지 않는다"]
+    },
+    {
+        question: "자신의 네트워크를 얼마나 다양하게 유지하고 있나요?",
+        choices: ["매우 다양하다", "다양한 편이다", "어느 정도 다양하다", "제한적이다"]
+    },
+    {
+        question: "네트워크 관리를 위해 특별한 도구나 방법을 사용하나요?",
+        choices: ["항상 사용한다", "자주 사용한다", "가끔 사용한다", "사용하지 않는다"]
+    },
+    {
+        question: "네트워킹이 개인의 성장과 성공에 미치는 영향을 어떻게 생각하나요?",
+        choices: ["매우 중요하다", "중요한 편이다", "어느 정도 중요하다", "크게 중요하지 않다"]
+    },
+    // 융합적 창의력 (10문항)
+    {
+        question: "다양한 분야의 지식을 연결하여 새로운 아이디어를 만들어내는 것을 얼마나 잘하나요?",
+        choices: ["매우 잘한다", "잘하는 편이다", "어느 정도 한다", "어렵다"]
+    },
+    {
+        question: "창의적인 문제 해결을 위해 얼마나 자주 브레인스토밍을 하나요?",
+        choices: ["매우 자주", "자주 한다", "가끔 한다", "거의 하지 않는다"]
+    },
+    {
+        question: "새로운 아이디어를 실험해보는 것을 얼마나 즐기나요?",
+        choices: ["매우 즐긴다", "즐기는 편이다", "어느 정도 즐긴다", "선호하지 않는다"]
+    },
+    {
+        question: "일상적인 것들에서 창의적인 영감을 얻는 빈도는 어떠한가요?",
+        choices: ["매우 자주", "자주 있다", "가끔 있다", "거의 없다"]
+    },
+    {
+        question: "다른 사람들과 아이디어를 공유하고 발전시키는 것을 얼마나 즐기나요?",
+        choices: ["매우 즐긴다", "즐기는 편이다", "어느 정도 즐긴다", "선호하지 않는다"]
+    },
+    {
+        question: "창의력 향상을 위해 특별히 하는 활동이 있나요?",
+        choices: ["정기적으로 한다", "자주 한다", "가끔 한다", "특별히 없다"]
+    },
+   {
+        question: "새로운 기술이나 트렌드를 자신의 분야에 적용해보려고 얼마나 노력하나요?",
+        choices: ["매우 노력한다", "노력하는 편이다", "가끔 노력한다", "거의 노력하지 않는다"]
+    },
+    {
+        question: "창의적인 아이디어가 떠올랐을 때 이를 기록하거나 발전시키는 습관이 있나요?",
+        choices: ["항상 그렇다", "자주 그렇다", "가끔 그렇다", "거의 그렇지 않다"]
+    },
+    {
+        question: "다른 분야의 지식이나 기술을 학습하는 것에 얼마나 관심이 있나요?",
+        choices: ["매우 관심 있다", "관심 있는 편이다", "어느 정도 관심 있다", "관심이 없다"]
+    },
+    {
+        question: "창의적인 프로젝트나 활동에 참여하는 빈도는 어떠한가요?",
+        choices: ["매우 자주", "자주 참여한다", "가끔 참여한다", "거의 참여하지 않는다"]
+    },
+    // 생존 실용력 (10문항)
+    {
+        question: "일상생활에서 마주치는 문제들을 얼마나 잘 해결하나요?",
+        choices: ["매우 잘 해결한다", "잘 해결하는 편이다", "어느 정도 해결한다", "어려움을 겪는다"]
+    },
+    {
+        question: "새로운 환경에 적응하는 능력이 어떠한가요?",
+        choices: ["매우 뛰어나다", "뛰어난 편이다", "보통이다", "어려움을 겪는다"]
+    },
+    {
+        question: "금전 관리를 얼마나 잘하고 있나요?",
+        choices: ["매우 잘한다", "잘하는 편이다", "어느 정도 한다", "잘 못한다"]
+    },
+    {
+        question: "응급 상황에서 대처하는 능력이 어떠한가요?",
+        choices: ["매우 뛰어나다", "뛰어난 편이다", "보통이다", "부족하다"]
+    },
+    {
+        question: "일상적인 가사 활동(요리, 청소 등)을 얼마나 잘 수행하나요?",
+        choices: ["매우 잘한다", "잘하는 편이다", "어느 정도 한다", "어려움을 겪는다"]
+    },
+    {
+        question: "시간 관리를 얼마나 잘하고 있나요?",
+        choices: ["매우 잘한다", "잘하는 편이다", "어느 정도 한다", "잘 못한다"]
+    },
+    {
+        question: "필요한 정보를 찾고 활용하는 능력이 어떠한가요?",
+        choices: ["매우 뛰어나다", "뛰어난 편이다", "보통이다", "부족하다"]
+    },
+    {
+        question: "기본적인 수리나 유지보수 작업을 얼마나 잘 수행할 수 있나요?",
+        choices: ["매우 잘한다", "잘하는 편이다", "어느 정도 한다", "거의 못한다"]
+    },
+    {
+        question: "스트레스 상황에서 집중력과 생산성을 유지하는 능력이 어떠한가요?",
+        choices: ["매우 뛰어나다", "뛰어난 편이다", "보통이다", "어려움을 겪는다"]
+    },
+    {
+        question: "장기적인 목표를 설정하고 이를 달성하기 위해 계획을 세우는 능력이 어떠한가요?",
+        choices: ["매우 뛰어나다", "뛰어난 편이다", "보통이다", "부족하다"]
+    }
+];
 
-    // 질문 로드
-    fetch('/get_questions')
-        .then(response => response.json())
-        .then(data => {
-            questions = data;
-            displayQuestions();
+let currentPage = 0;
+const questionsPerPage = 5;
+const container = document.getElementById('question-container');
+const nextButton = document.getElementById('next-button');
+
+function loadQuestions() {
+    container.innerHTML = '';
+    const start = currentPage * questionsPerPage;
+    const end = start + questionsPerPage;
+    const currentQuestions = questions.slice(start, end);
+
+    currentQuestions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('question');
+
+        const label = document.createElement('label');
+        label.textContent = q.question;
+        questionDiv.appendChild(label);
+
+        q.choices.forEach((choice, choiceIndex) => {
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = `q${start + index + 1}`;
+            input.value = choiceIndex + 1;
+
+            const choiceLabel = document.createElement('label');
+            choiceLabel.textContent = choice;
+
+            questionDiv.appendChild(input);
+            questionDiv.appendChild(choiceLabel);
+            questionDiv.appendChild(document.createElement('br'));
         });
 
-    // 질문 표시
-    function displayQuestions() {
-        const questionContainer = document.getElementById('question-container');
-        questionContainer.innerHTML = '';
-
-        const questionKeys = Object.keys(questions);
-        const start = currentPage * questionsPerPage;
-        const end = Math.min(start + questionsPerPage, questionKeys.length);
-
-        for (let i = start; i < end; i++) {
-            const category = questionKeys[i];
-            const qs = questions[category];
-
-            qs.forEach(q => {
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'question';
-
-                const label = document.createElement('label');
-                label.textContent = q.text;
-                questionDiv.appendChild(label);
-
-                q.choices.forEach((choice, idx) => {
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.name = q.id;
-                    input.value = idx + 1;
-                    input.addEventListener('change', checkAllAnswered);
-                    questionDiv.appendChild(input);
-
-                    const choiceLabel = document.createElement('span');
-                    choiceLabel.textContent = choice;
-                    questionDiv.appendChild(choiceLabel);
-
-                    questionDiv.appendChild(document.createElement('br'));
-                });
-
-                questionContainer.appendChild(questionDiv);
-            });
-        }
-    }
-
-    // 모든 질문이 응답되었는지 확인
-    function checkAllAnswered() {
-        const allQuestions = document.querySelectorAll('.question');
-        const allAnswered = Array.from(allQuestions).every(q => {
-            const inputs = q.querySelectorAll('input[type="radio"]');
-            return Array.from(inputs).some(input => input.checked);
-        });
-
-        document.getElementById('next-button').disabled = !allAnswered;
-    }
-
-    // 다음 페이지로 이동
-    document.getElementById('next-button').addEventListener('click', () => {
-        const questionKeys = Object.keys(questions);
-        const start = currentPage * questionsPerPage;
-        const end = Math.min(start + questionsPerPage, questionKeys.length);
-
-        for (let i = start; i < end; i++) {
-            const category = questionKeys[i];
-            const qs = questions[category];
-
-            qs.forEach(q => {
-                const selected = document.querySelector(`input[name="${q.id}"]:checked`);
-                if (selected) {
-                    responses[q.id] = selected.value;
-                }
-            });
-        }
-
-        currentPage++;
-        if (currentPage * questionsPerPage >= questionKeys.length) {
-            submitResponses();
-        } else {
-            displayQuestions();
-        }
+        container.appendChild(questionDiv);
     });
 
-    // 응답 제출
-    function submitResponses() {
-        fetch('/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(responses)
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(`당신의 유형은: ${data.type}\n${data.message}`);
-        });
+    nextButton.disabled = false;
+}
+
+nextButton.addEventListener('click', () => {
+    currentPage++;
+    if (currentPage * questionsPerPage >= questions.length) {
+        alert('설문이 완료되었습니다. 결과를 제출합니다.');
+        // 설문 결과 제출 로직 추가
+    } else {
+        loadQuestions();
     }
 });
+
+loadQuestions();
